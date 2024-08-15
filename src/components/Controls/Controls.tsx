@@ -1,30 +1,51 @@
-import { UnknownAction } from "@reduxjs/toolkit"
 import { useDispatch } from "react-redux"
 import { gameActions } from "../../services/gameSlice"
 
 type Button = {
     name: string
     duration: number
-    callback?: UnknownAction
+    profit: number
+}
+
+type Craftables = {
+    farm: {
+        exists: boolean,
+        craft: number
+    },
+    hunting: {
+        exists: boolean,
+        craft: number
+    },
+    fishing: {
+        exists: boolean,
+        craft: number,
+        broken: boolean,
+        usage: number
+    }
 }
 
 type ButtonsSetProps = {
-    buttons: Button[]
+    buttons: Button[],
+    craftables: Craftables
 }
 
-export const Controls = ( {buttons}: ButtonsSetProps ) => {
+export const Controls = ( {buttons, craftables}: ButtonsSetProps ) => {
     const dispatch = useDispatch()
-
     return (
         <div>
             {buttons.map(b => (
                 <button 
                     key={b.name} 
                     onClick={() => {
-                            dispatch(b.callback)
-                            dispatch(gameActions.passDay({days: b.duration})) 
+                            
+                            if(craftables.fishing.usage != 12) {dispatch(gameActions.useCraftable('fishing'))
+                                dispatch(gameActions.passDay({days: b.duration})) 
+                            dispatch(gameActions.addStats({food: b.profit}))
+                            dispatch(gameActions.reduceStats({food: b.duration}))
+                            }
                         }
                     }
+                    disabled={craftables[b.name] ? !craftables[b.name]?.exists : false}
                     style={{border: '1px solid black', padding: '5px 10px', fontSize: '16px', textAlign: 'center', outline: 'unset'}}
                 >
                     {b.name}
