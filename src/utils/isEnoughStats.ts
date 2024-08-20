@@ -1,2 +1,7 @@
-export const isEnoughStats = (food: number) : boolean => food === 0 ? false : true
+type Stats = {
+    food: number,
+    housing: boolean,
+    cloth: boolean
+}
 
+export const isEnoughStats = (stats: Stats): boolean => Object.values(stats).every(Boolean) ? true : false

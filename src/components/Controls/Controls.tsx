@@ -21,6 +21,7 @@ type Craftables = {
         craft: number,
         broken: boolean,
         usage: number
+        resource: number
     }
 }
 
@@ -37,15 +38,20 @@ export const Controls = ( {buttons, craftables}: ButtonsSetProps ) => {
                 <button 
                     key={b.name} 
                     onClick={() => {
-                            
-                            if(craftables.fishing.usage != 12) {dispatch(gameActions.useCraftable('fishing'))
+                            if(craftables[b.name as keyof typeof craftables] && craftables[b.name].usage != 12) {
+                                dispatch(gameActions.useCraftable(b.name))
                                 dispatch(gameActions.passDay({days: b.duration})) 
-                            dispatch(gameActions.addStats({food: b.profit}))
-                            dispatch(gameActions.reduceStats({food: b.duration}))
+                                dispatch(gameActions.addStats({food: b.profit}))
+                                dispatch(gameActions.reduceStats({food: b.duration}))
+                            }
+                            else {
+                                dispatch(gameActions.passDay({days: b.duration})) 
+                                dispatch(gameActions.addStats({food: b.profit}))
+                                dispatch(gameActions.reduceStats({food: b.duration}))
                             }
                         }
                     }
-                    disabled={craftables[b.name] ? !craftables[b.name]?.exists : false}
+                    disabled={craftables[b.name as keyof typeof craftables] ? craftables[b.name as keyof typeof craftables].exists ? craftables[b.name].broken ? true : false : true : false}
                     style={{border: '1px solid black', padding: '5px 10px', fontSize: '16px', textAlign: 'center', outline: 'unset'}}
                 >
                     {b.name}
