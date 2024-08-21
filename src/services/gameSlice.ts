@@ -22,7 +22,8 @@ const initialState = {
             craft: 10,
             broken: false,
             usage: 0,
-            resource: 12
+            resource: 12,
+            repair: 7
         }
     },
     housing: {
@@ -130,17 +131,17 @@ const slice = createSlice({
         fixBoat: state => {
             state.boat += 1
         },
-        createCraftable: (state, action: PayloadAction<Craftable>) => {
+        createCraftable: (state, action: PayloadAction<CraftableName>) => {
             state.craftables[action.payload].exists = true
         },
-        useCraftable: (state, action: PayloadAction<Craftable>) => {
+        useCraftable: (state, action: PayloadAction<CraftableName>) => {
             state.craftables[action.payload].usage += 1
             if(state.craftables[action.payload].usage === 12) {
                 state.craftables[action.payload].broken = true
             }
             
         },
-        resetCraftable: (state, action: PayloadAction<Craftable>) => {
+        resetCraftable: (state, action: PayloadAction<CraftableName>) => {
             state.craftables[action.payload].usage = 0
             if(state.craftables[action.payload].broken) {
                 state.craftables[action.payload].broken = false
@@ -187,4 +188,4 @@ export const gameReducer = slice.reducer
 export const gameActions = slice.actions
 
 type Housing = 'hut' | 'house'
-type Craftable = 'fishing' | 'hunting' | 'farm'
+export type CraftableName = 'fishing' | 'hunting' | 'farm'
