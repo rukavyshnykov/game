@@ -23,14 +23,14 @@ export const MainView = () => {
     }
 
     const reserveDaysForMaintaining = () => {
-        const check = [...Object.values(clothes).filter(el => el.exists && el.maintenance.done === false), ...Object.values(housing)
-            .filter(el => el.exists && el.maintenance.done === false)]
+        const check = [...Object.values(clothes).filter(el => el.exists && el.maintenance && el.maintenance.done === false), ...Object.values(housing)
+            .filter(el => el.exists && el.maintenance && el.maintenance.done === false)]
             .reduce((a, b) => a + b.maintenance.duration, 0)
         console.log(check)
         return check
     }
 
-    if(boat >= 100) return <>Congratulations! You have finished the game</>
+    if(boat >= 100) return <>Congratulations! You have finished the game<br/>It took you {totalDays} days</>
 
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>

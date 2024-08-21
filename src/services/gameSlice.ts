@@ -90,14 +90,14 @@ const slice = createSlice({
                 {
                     if(state.housing[h].exists) {
                         state.housing[h].usage += action.payload.days
-                        state.housing[h].maintenance.usage += action.payload.days
+                        if(state.housing[h].maintenance) {state.housing[h].maintenance.usage += action.payload.days}
 
                         if(state.housing[h].usage >= state.housing[h].repair.longevity) {
                             state.housing[h].broken = true
                             state.stats.housing = false
                         }
 
-                        if(state.housing[h].maintenance.usage >= state.housing[h].maintenance.longevity) {
+                        if(state.housing[h].maintenance && state.housing[h].maintenance.usage >= state.housing[h].maintenance.longevity) {
                             state.housing[h].maintenance.done = false
                         }
                     }
