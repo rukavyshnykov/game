@@ -11,6 +11,7 @@ export const MainView = () => {
     const totalDays = useSelector((state: RootState) => state.game.totalDays)
     const craftables = useSelector((state: RootState) => state.game.craftables)
     const housing = useSelector((state: RootState) => state.game.housing)
+    const clothes = useSelector((state: RootState) => state.game.clothes)
     const dispatch = useDispatch()
 
     const findHousing = () => {
@@ -20,6 +21,16 @@ export const MainView = () => {
             }
         }
     }
+
+    const reserveDaysForMaintaining = () => {
+        const check = [...Object.values(clothes).filter(el => el.exists && el.maintenance.done === false), ...Object.values(housing)
+            .filter(el => el.exists && el.maintenance.done === false)]
+            .reduce((a, b) => a + b.maintenance.duration, 0)
+        console.log(check)
+        return check
+    }
+
+    if(boat >= 100) return <>Congratulations! You have finished the game</>
 
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>
@@ -44,7 +55,7 @@ export const MainView = () => {
                         dispatch(gameActions.passDay({days: 1}))
                         dispatch(gameActions.reduceStats({food: 1}))
                     }}
-                    disabled={!isEnoughStats(stats) || housing.house.exists && ((30 - (totalDays % 30)) < housing.house.maintenance.duration)}
+                    disabled={!isEnoughStats(stats) || ((30 - (totalDays % 30)) <= reserveDaysForMaintaining())}
                 >Fix a boat</button>
                 <hr style={{width: '100%'}}/>
                 <div>
@@ -142,9 +153,41 @@ export const MainView = () => {
                     }}>Maintain</button>
                 }
                 <hr style={{width: '100%'}}/>
-                <button onClick={() => {
-                    dispatch(gameActions.buildHousing('hut'))
-                }}>Craft a set of clothes</button>
+                {
+                    !clothes.set.exists ? 
+                    (
+                        <button onClick={() => {
+                            dispatch(gameActions.craftSet())
+                            dispatch(gameActions.passDay({days: clothes.set.build}))
+                            dispatch(gameActions.reduceStats({food: clothes.set.build}))
+                        }}>Craft a set of clothes</button>
+                    )
+                    :
+                    (
+                        clothes.set.usage >= clothes.set.repair.longevity ?
+                        (
+                            <button
+                                onClick={() => {
+                                    dispatch(gameActions.resetSet())
+                                    dispatch(gameActions.passDay({days: clothes.set.repair.duration}))
+                                    dispatch(gameActions.reduceStats({food: clothes.set.repair.duration}))
+                                }}
+                            >
+                                Repair
+                            </button>
+                        )
+                        :
+                        (
+                            <>Set - Days used: {clothes.set.usage}</>
+                        )
+                    )
+                }
+                {
+                    clothes.set.exists && !clothes.set.maintenance.done && <button onClick={() => {
+                        dispatch(gameActions.maintainSet())
+                        dispatch(gameActions.passDay({days: clothes.set.maintenance.duration}))
+                    }}>Maintain</button>
+                }
             </div>
             <div style={{position: 'absolute', top: '20px', left: '20px'}}>Day {totalDays === 30 ? 30 : totalDays % 30} of 30</div>
         </div>

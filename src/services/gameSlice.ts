@@ -43,9 +43,35 @@ const initialState = {
                 longevity: 180
             },
             maintenance: {
-                duration: 5,
+                duration: 1,
                 longevity: 30,
-                done: false
+                done: false,
+                usage: 0
+            },
+            exists: false,
+            usage: 0,
+            broken: false
+        }
+    },
+    clothes: {
+        default: {
+            maintenance: {
+                longevity: 30,
+                duration: 3
+            },
+            exists: true,
+        },
+        set: {
+            build: 5,
+            repair: {
+                longevity: 90,
+                duration: 2
+            },
+            maintenance: {
+                duration: 1,
+                longevity: 20,
+                done: false,
+                usage: 0
             },
             exists: false,
             usage: 0,
@@ -64,14 +90,31 @@ const slice = createSlice({
                 {
                     if(state.housing[h].exists) {
                         state.housing[h].usage += action.payload.days
+                        state.housing[h].maintenance.usage += action.payload.days
 
                         if(state.housing[h].usage >= state.housing[h].repair.longevity) {
                             state.housing[h].broken = true
                             state.stats.housing = false
                         }
+
+                        if(state.housing[h].maintenance.usage >= state.housing[h].maintenance.longevity) {
+                            state.housing[h].maintenance.done = false
+                        }
                     }
                 }
             )
+            if(state.clothes.set.exists) {
+                state.clothes.set.usage += action.payload.days
+                state.clothes.set.maintenance.usage += action.payload.days
+
+                if(state.clothes.set.usage >=  state.clothes.set.repair.longevity) {
+                    state.clothes.set.broken = true
+                    state.stats.cloth = false
+                }
+                if(state.clothes.set.maintenance.usage >=  state.clothes.set.maintenance.longevity) {
+                    state.clothes.set.maintenance.done = false
+                }
+            }
         },
         addStats: (state, action: PayloadAction<{food: number}>) => {   
             state.stats.food += action.payload.food
@@ -120,7 +163,23 @@ const slice = createSlice({
         },
         maintainHouse: (state) => {
             state.housing.house.maintenance.done = true
+            state.housing.house.maintenance.usage = 0
         },
+        craftSet: (state) => {
+            state.clothes.set.exists = true
+            state.clothes.default.exists = false
+        },
+        resetSet: (state) => {
+            state.clothes.set.usage = 0
+            if(state.clothes.set.broken) {
+                state.clothes.set.broken = false
+                state.stats.cloth = true
+            }
+        },
+        maintainSet: (state) => {
+            state.clothes.set.maintenance.done = true
+            state.clothes.set.maintenance.usage = 0
+        }
     }
 })
 
