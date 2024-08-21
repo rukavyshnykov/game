@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../../services/store"
 import { gameActions } from "../../services/gameSlice"
 import { isEnoughStats } from "../../utils/isEnoughStats"
+import { Calendar } from "../Calendar/Calendar"
 
 export const MainView = () => {
     const stats = useSelector((state: RootState) => state.game.stats)
@@ -188,8 +189,8 @@ export const MainView = () => {
                         dispatch(gameActions.passDay({days: clothes.set.maintenance.duration}))
                     }}>Maintain</button>
                 }
+                <Calendar />
             </div>
-            <div style={{position: 'absolute', top: '20px', left: '20px'}}>Day {totalDays === 30 ? 30 : totalDays % 30} of 30</div>
         </div>
     )
 }
